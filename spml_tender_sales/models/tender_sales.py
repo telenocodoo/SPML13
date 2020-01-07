@@ -21,7 +21,7 @@ class TenderSalesDelivery(models.Model):
             print(rec.tender_id, rec.product_id, rec.delivered_quantity, rec.balance)
             if rec.product_id ==pid :
                 rec.delivered_quantity += qty
-    @api.multi
+    
     def button_validate(self):
         stock_sale_id = self.sale_id.id
         tender_obj = self.env['tender.sales'].search([('sale_id', '=', stock_sale_id)])
@@ -149,7 +149,7 @@ class SaleOrder(models.Model):
         })
         return super(SaleOrder, self).copy(default=default)
 
-    @api.multi
+    
     def tender_sales_action(self):
         tender_id = self.env['tender.sales']
         tender_line_id = self.env['tender.sales.lines']
@@ -235,7 +235,7 @@ class TenderWizard(models.TransientModel):
             'number': line.number,
         }
 
-    @api.model
+    
     def default_get(self, fields_list):
         """get default lines"""
         res = super(TenderWizard, self).default_get(fields_list)
@@ -255,7 +255,7 @@ class TenderWizard(models.TransientModel):
         res['tender_ids'] = items
         return res
 
-    @api.multi
+   
     def compute_product_quantity(self):
         quantity1 = 0
         total1 = 0
@@ -296,7 +296,7 @@ class TenderWizard(models.TransientModel):
             'note': self.note2,
         })
 
-    @api.multi
+    
     def move_product_quantity(self):
         create = False
         for rec in self:
@@ -350,7 +350,7 @@ class TenderSales(models.Model):
             action['res_id'] = pickings.id
         return action
 
-    @api.multi
+    
     def transfer_quantity_to_product(self):
         print("yes")
         lst = []
@@ -390,7 +390,7 @@ class TenderSalesLines(models.Model):
     note = fields.Char()
     is_move = fields.Boolean()
 
-    @api.multi
+    
     def transfer_product_quantity(self):
         tender_delivery_id = self.env['tender.delivered.quantity']
         tender_search_id = tender_delivery_id.search([('tender_sales_id', '=', self.id)])
