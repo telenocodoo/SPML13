@@ -122,7 +122,7 @@ class SaleOrder(models.Model):
     tender_id = fields.Many2one("tender.sales")
 
     #This will over ride delivery button haytham
-    @api.multi
+    
     def action_view_delivery(self):
         '''
         This function returns an action that display existing delivery orders
@@ -332,7 +332,7 @@ class TenderSales(models.Model):
 
 
     # This will over ride delivery button haytham
-    @api.multi
+    
     def action_view_delivery(self):
         '''
         This function returns an action that display existing delivery orders
