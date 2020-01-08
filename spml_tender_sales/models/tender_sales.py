@@ -140,7 +140,7 @@ class SaleOrder(models.Model):
             action['res_id'] = pickings.id
         return action
 
-    @api.one
+   
     @api.returns('self', lambda value: value.id)
     def copy(self, default=None):
         default = {} if default is None else default.copy()
