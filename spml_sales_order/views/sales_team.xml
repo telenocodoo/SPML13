@@ -1,0 +1,38 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="crm_team_view_form_inherit">
+            <field name="name">crm.team.form</field>
+            <field name="model">crm.team</field>
+            <field name="inherit_id" ref="sales_team.crm_team_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page string="Sales Team Discount">
+                        <group>
+                            <label for="discount_from" string="Sales Team Discount" />
+                            <div>
+                                From: <field name="discount_from" style="width: 5%" />%
+                                To : <field name="discount_to" style="width: 5%" />%
+                            </div>
+                        </group>
+                    </page>
+                    <page string="Sales Team Commission">
+                        <group>
+                            <label for="sales_commission" string="Sales Team Commission" />
+                            <div>
+                                <field name="sales_commission" style="width: 10%" />%
+                            </div>
+                        </group>
+                        <field name="commission_ids">
+                            <tree string="commission" editable="bottom">
+                                <field name="sale_id" string="sales order"/>
+                                <field name="sales_commission" />
+                                <field name="date" />
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

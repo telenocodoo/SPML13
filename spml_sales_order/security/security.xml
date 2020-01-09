@@ -1,0 +1,7 @@
+<odoo>
+    <data>
+        <record model="res.groups" id="group_approved_sales_team">
+                <field name="name">Approved sales Team</field>
+        </record>
+    </data>
+</odoo>
