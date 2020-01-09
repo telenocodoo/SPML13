@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_call_of_sales,access_call_of_sales,model_call_of_sales,,1,1,1,1
+access_call_of_sales_lines,access_call_of_sales_lines,model_call_of_sales_lines,,1,1,1,1
+access_call_of_delivered_quantity,access_call_of_delivered_quantity,model_call_of_delivered_quantity,,1,1,1,1
+access_call_of_delivered_quantity_lines,access_call_of_delivered_quantity_lines,model_call_of_delivered_quantity_lines,,1,1,1,1
