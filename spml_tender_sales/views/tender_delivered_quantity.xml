@@ -5,7 +5,6 @@
             <field name="model">tender.delivered.quantity</field>
             <field name="arch" type="xml">
                 <form>
-
                     <sheet>
                         <group>
                             <field name="invoice_id" readonly="True"/>
@@ -21,7 +20,7 @@
                                     <tree editable="bottom">
                                         <field name="quantity" sum="Total"/>
                                         <field name="date"/>
-                                        <button name="move_quantity_to_stock" string="move from stock" type="object" />
+                                        <button name="move_quantity_to_stock" string="move to stock" type="object" />
                                     </tree>
                                 </field>
                             </page>

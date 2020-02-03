@@ -9,7 +9,7 @@ class TenderDeliveredQuantity(models.Model):
     _rec_name = 'sale_id'
 
     tender_sales_id = fields.Many2one("tender.sales.lines")
-    invoice_id = fields.Many2one("account.invoice")
+    invoice_id = fields.Many2one("account.move")
     sale_id = fields.Many2one("sale.order")
     product_id = fields.Many2one("product.product")
     quantity = fields.Float('ordered Quantity')
@@ -17,7 +17,7 @@ class TenderDeliveredQuantity(models.Model):
     tender_delivered_ids = fields.One2many("tender.delivered.quantity.lines", "tender_delivered_id")
 
     # @api.constrains('quantity')
-   
+    # @api.multi
     def write(self, vals):
         res = super(TenderDeliveredQuantity, self).write(vals)
         for record in self:
@@ -39,7 +39,7 @@ class TenderDeliveredQuantityLines(models.Model):
     quantity = fields.Float()
     date = fields.Datetime(default=fields.datetime.now())
 
-    
+    # @api.multi
     def move_quantity_to_stock(self):
         stock_id = self.env['stock.picking'].search([('origin', '=', self.tender_delivered_id.sale_id.name)])
         if stock_id:
@@ -60,7 +60,7 @@ class TenderDeliveredQuantityLines(models.Model):
                 # }
 
 
-    
+    # @api.multi
     # def transfer_quantity_to_product(self):
     #     print("yes")
     #
