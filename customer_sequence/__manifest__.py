@@ -35,12 +35,7 @@
     'summary': """Unique Customer Code""",
     'description': """
        Each customer have unique number code
-#    GNU AFFERO GENERAL PUBLIC LICENSE (AGPL v3) for more details.
-#
-#    You should have received a copy of the GNU AFFERO GENERAL PUBLIC LICENSE
-#    (AGPL v3) along with this program.
-#    If not, see <http://www.gnu.org/licenses/>.
-#
+   """
 {
     'name': "Customer Sequence",
     'version': '13.0.1.0.0',
