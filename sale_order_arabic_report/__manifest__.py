@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "sale order arabic report",
+    'name': "sale order arabic report2",
     'summary': """
         sale order arabic report""",
     'description': """
