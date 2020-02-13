@@ -36,7 +36,6 @@
     'description': """
        Each customer have unique number code
    """
-{
     'name': "Customer Sequence",
     'version': '13.0.1.0.0',
     'summary': """Unique Customer Code""",
