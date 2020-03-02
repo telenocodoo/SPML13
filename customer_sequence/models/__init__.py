@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+<<<<<<< HEAD
+
+=======
 #############################################################################
 #
 #    Cybrosys Technologies Pvt. Ltd.
@@ -19,5 +22,6 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
+>>>>>>> b1379c668301268cf4eec9da14504d2694f756c5
 from . import res_company
 from . import res_partner

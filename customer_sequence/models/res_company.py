@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+<<<<<<< HEAD
+=======
 #############################################################################
 #
 #    Cybrosys Technologies Pvt. Ltd.
@@ -19,6 +21,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
+>>>>>>> b1379c668301268cf4eec9da14504d2694f756c5
 
 from odoo import models, fields
 
@@ -27,4 +30,8 @@ class CompanySequence(models.Model):
     _inherit = 'res.company'
 
     customer_code = fields.Integer(string='Customer code', required=True)
+<<<<<<< HEAD
+    supp_code = fields.Integer(string='Supplier code')
+=======
+>>>>>>> b1379c668301268cf4eec9da14504d2694f756c5
     next_code = fields.Integer(string='Next code')

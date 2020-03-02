@@ -1,118 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# from odoo import models, fields, api, _
-# from odoo.exceptions import UserError
-
-
-from odoo import api, fields, models, _, SUPERUSER_ID
-# from odoo.osv import expression
-# from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
-from odoo.tools.float_utils import float_compare, float_is_zero, float_round
+from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-# from odoo.addons.stock.models.stock_move import PROCUREMENT_PRIORITIES
 
-
-
-class TenderSalesDelivery(models.Model):
-    _inherit ='stock.picking'
-
-    def add_done_qty(self,line_ids,pid,qty):
-        for rec in line_ids:
-            print(rec.tender_id, rec.product_id, rec.delivered_quantity, rec.balance)
-            if rec.product_id ==pid :
-                rec.delivered_quantity += qty
-    
-    def button_validate(self):
-        stock_sale_id = self.sale_id.id
-        tender_obj = self.env['tender.sales'].search([('sale_id', '=', stock_sale_id)])
-        tender_line_ids = self.env['tender.sales.lines'].search([('tender_id', '=', tender_obj.id)])
-
-        # print(stock_sale_id)
-
-        #
-        self.ensure_one()
-        if not self.move_lines and not self.move_line_ids:
-            raise UserError(_('Please add some items to move.'))
-        # else :
-
-
-        # If no lots when needed, raise error
-        picking_type = self.picking_type_id
-        precision_digits = self.env['decimal.precision'].precision_get('Product Unit of Measure')
-        no_quantities_done = all(float_is_zero(move_line.qty_done, precision_digits=precision_digits) for move_line in
-                                 self.move_line_ids.filtered(lambda m: m.state not in ('done', 'cancel')))
-        no_reserved_quantities = all(
-            float_is_zero(move_line.product_qty, precision_rounding=move_line.product_uom_id.rounding) for move_line in
-            self.move_line_ids)
-        if no_reserved_quantities and no_quantities_done:
-            raise UserError(_(
-                'You cannot validate a transfer if no quantites are reserved nor done. To force the transfer, switch in edit more and encode the done quantities.'))
-
-        if picking_type.use_create_lots or picking_type.use_existing_lots:
-            lines_to_check = self.move_line_ids
-            if not no_quantities_done:
-                lines_to_check = lines_to_check.filtered(
-                    lambda line: float_compare(line.qty_done, 0,
-                                               precision_rounding=line.product_uom_id.rounding)
-                )
-
-            for line in lines_to_check:
-                product = line.product_id
-                if product and product.tracking != 'none':
-                    if not line.lot_name and not line.lot_id:
-                        raise UserError(
-                            _('You need to supply a Lot/Serial number for product %s.') % product.display_name)
-
-        if no_quantities_done:
-            view = self.env.ref('stock.view_immediate_transfer')
-            wiz = self.env['stock.immediate.transfer'].create({'pick_ids': [(4, self.id)]})
-            return {
-                'name': _('Immediate Transfer?'),
-                'type': 'ir.actions.act_window',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'res_model': 'stock.immediate.transfer',
-                'views': [(view.id, 'form')],
-                'view_id': view.id,
-                'target': 'new',
-                'res_id': wiz.id,
-                'context': self.env.context,
-            }
-
-        if self._get_overprocessed_stock_moves() and not self._context.get('skip_overprocessed_check'):
-            view = self.env.ref('stock.view_overprocessed_transfer')
-            wiz = self.env['stock.overprocessed.transfer'].create({'picking_id': self.id})
-            return {
-                'type': 'ir.actions.act_window',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'res_model': 'stock.overprocessed.transfer',
-                'views': [(view.id, 'form')],
-                'view_id': view.id,
-                'target': 'new',
-                'res_id': wiz.id,
-                'context': self.env.context,
-            }
-
-        # Check backorder should check for other barcodes
-        if self._check_backorder():
-            for rec in self.move_line_ids:
-                print(rec.qty_done, rec.product_id, rec.move_id.name, rec.move_id.product_uom_qty)
-                self.add_done_qty(tender_line_ids, rec.product_id, rec.qty_done)
-                # print(rec.qty_done, rec.product_id, rec.move_id.name, rec.move_id.product_uom_qty)
-
-            print("hi... Validate haytham")
-            return self.action_generate_backorder_wizard()
-        self.action_done()
-        return
-
-#
-# for rec in self.move_line_ids:
-#     print(rec.qty_done, rec.product_id, rec.move_id.name, rec.move_id.product_uom_qty)
-#     self.add_done_qty(tender_line_ids, rec.product_id, rec.qty_done)
-#     print(rec.qty_done, rec.product_id, rec.move_id.name, rec.move_id.product_uom_qty)
-#
-# print("hi... Validate haytham")
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
@@ -121,26 +11,7 @@ class SaleOrder(models.Model):
     period = fields.Selection(selection=[('weekly', 'weekly'), ('monthly', 'monthly'), ])
     tender_id = fields.Many2one("tender.sales")
 
-    #This will over ride delivery button haytham
-    
-    def action_view_delivery(self):
-        '''
-        This function returns an action that display existing delivery orders
-        of given sales order ids. It can either be a in a list or in a form
-        view, if there is only one delivery order to show.
-        '''
-        action = self.env.ref('stock.action_picking_tree_all').read()[0]
-
-        pickings = self.mapped('picking_ids')
-        print("hi ... haytham")
-        if len(pickings) > 1:
-            action['domain'] = [('id', 'in', pickings.ids)]
-        elif pickings:
-            action['views'] = [(self.env.ref('stock.view_picking_form').id, 'form')]
-            action['res_id'] = pickings.id
-        return action
-
-   
+    # @api.one
     @api.returns('self', lambda value: value.id)
     def copy(self, default=None):
         default = {} if default is None else default.copy()
@@ -149,12 +20,11 @@ class SaleOrder(models.Model):
         })
         return super(SaleOrder, self).copy(default=default)
 
-    
+    # @api.multi
     def tender_sales_action(self):
         tender_id = self.env['tender.sales']
         tender_line_id = self.env['tender.sales.lines']
-        invoice_id = self.env['account.invoice'].search([('origin', '=', self.name)], limit=1)
-
+        invoice_id = self.env['account.move'].search([('invoice_origin', '=', self.name)], limit=1)
         for record in self:
             tender_obj = tender_id.create({
                 'sale_id': self.id,
@@ -235,7 +105,7 @@ class TenderWizard(models.TransientModel):
             'number': line.number,
         }
 
-    
+    @api.model
     def default_get(self, fields_list):
         """get default lines"""
         res = super(TenderWizard, self).default_get(fields_list)
@@ -255,7 +125,7 @@ class TenderWizard(models.TransientModel):
         res['tender_ids'] = items
         return res
 
-   
+    # @api.multi
     def compute_product_quantity(self):
         quantity1 = 0
         total1 = 0
@@ -266,37 +136,98 @@ class TenderWizard(models.TransientModel):
         remain1 = 0
         remain2 = 0
         current_qty = 0
+        needed_qty = 0
+        cost_of_p2 = 0
+        qty_needed_from_p1 = 0
+        balance_p1 = 0
         for record in self:
-            current_qty = self.quantity2
-            quantity1 = int(record.total2 / record.cost1)
-            total1 = quantity1 * record.cost1
-            total2 = record.total2 - total1
-            balance = int(total2 / record.cost2)
-            tot2 = balance * record.cost2
-            remain1 = total2 - tot2
-            balance2 = current_qty - balance
+            needed_qty = self.quantity2
+            print("sssssssssss", needed_qty)
+            print("ccccccccc", self.quantity2)
+            cost_of_p2 = needed_qty * record.cost2
+            qty_needed_from_p1 = cost_of_p2 / record.cost1
+            balance_p1 = record.quantity1 - qty_needed_from_p1
+            total1 = balance_p1 * record.cost1
+            total2 = needed_qty * record.cost2
+            # current_qty = self.quantity2
+            # quantity1 = int(record.total2 / record.cost1)
+            # total1 = quantity1 * record.cost1
+            # total2 = record.total2 - total1
+            # balance = int(total2 / record.cost2)
+            # tot2 = balance * record.cost2
+            # remain1 = total2 - tot2
+            # balance2 = current_qty - balance
+        print("needed_qty : ", needed_qty)
+        print("cost_of_p2 : ", cost_of_p2)
+        print("qty_needed_from_p1 : ", qty_needed_from_p1)
+        print("balance_p1 : ", balance_p1)
 
-        self.quantity1 = quantity1
-        self.quantity2 = balance
+        self.quantity1 = balance_p1
+        self.quantity2 = needed_qty
         self.total1 = total1
         self.total2 = total2
+        # self.quantity1 = quantity1
+        # self.quantity2 = balance
+        # self.total1 = total1
+        # self.total2 = total2
         # self.remain1 = remain1
         # self.remain2 = remain2
 
-        self.note2 += "and new quantity is " + str(balance) + "and remain" + str(remain1)
-        self.note1 += "and we add " + str(quantity1)
+        self.note2 += "and new quantity is " + str(needed_qty)
+        # + "and remain" + str(remain1)
+        self.note1 += "and we take " + str(qty_needed_from_p1)
 
         self.line_id1.write({
-            'ordered_quantity': self.line_id1.ordered_quantity + self.quantity1,
+            'ordered_quantity': self.line_id1.ordered_quantity - qty_needed_from_p1,
             'note': self.note1,
         })
         # self.quantity2
         self.line_id2.write({
-            'ordered_quantity': self.line_id2.ordered_quantity-balance2,
+            'ordered_quantity': self.line_id2.ordered_quantity+needed_qty,
             'note': self.note2,
         })
+ # @api.multi
+ #    def compute_product_quantity(self):
+ #        quantity1 = 0
+ #        total1 = 0
+ #        total2 = 0
+ #        tot2 = 0
+ #        balance = 0
+ #        balance2 = 0
+ #        remain1 = 0
+ #        remain2 = 0
+ #        current_qty = 0
+ #        for record in self:
+ #            current_qty = self.quantity2
+ #            quantity1 = int(record.total2 / record.cost1)
+ #            total1 = quantity1 * record.cost1
+ #            total2 = record.total2 - total1
+ #            balance = int(total2 / record.cost2)
+ #            tot2 = balance * record.cost2
+ #            remain1 = total2 - tot2
+ #            balance2 = current_qty - balance
+ #
+ #        self.quantity1 = quantity1
+ #        self.quantity2 = balance
+ #        self.total1 = total1
+ #        self.total2 = total2
+ #        # self.remain1 = remain1
+ #        # self.remain2 = remain2
+ #
+ #        self.note2 += "and new quantity is " + str(balance) + "and remain" + str(remain1)
+ #        self.note1 += "and we add " + str(quantity1)
+ #
+ #        self.line_id1.write({
+ #            'ordered_quantity': self.line_id1.ordered_quantity + self.quantity1,
+ #            'note': self.note1,
+ #        })
+ #        # self.quantity2
+ #        self.line_id2.write({
+ #            'ordered_quantity': self.line_id2.ordered_quantity-balance2,
+ #            'note': self.note2,
+ #        })
 
-    
+    # @api.multi
     def move_product_quantity(self):
         create = False
         for rec in self:
@@ -326,31 +257,11 @@ class TenderSales(models.Model):
     _rec_name = 'sale_id'
 
     sale_id = fields.Many2one("sale.order")
-    invoice_id = fields.Many2one("account.invoice")
+    invoice_id = fields.Many2one("account.move")
     tender_ids = fields.One2many("tender.sales.lines", "tender_id")
     period = fields.Selection(selection=[('weekly', 'weekly'), ('monthly', 'monthly'), ])
 
-
-    # This will over ride delivery button haytham
-    
-    def action_view_delivery(self):
-        '''
-        This function returns an action that display existing delivery orders
-        of given sales order ids. It can either be a in a list or in a form
-        view, if there is only one delivery order to show.
-        '''
-        action = self.env.ref('stock.action_picking_tree_all').read()[0]
-
-        pickings = self.mapped('picking_ids')
-        print("hi ... haytham sales tender")
-        if len(pickings) > 1:
-            action['domain'] = [('id', 'in', pickings.ids)]
-        elif pickings:
-            action['views'] = [(self.env.ref('stock.view_picking_form').id, 'form')]
-            action['res_id'] = pickings.id
-        return action
-
-    
+    # @api.multi
     def transfer_quantity_to_product(self):
         print("yes")
         lst = []
@@ -390,7 +301,7 @@ class TenderSalesLines(models.Model):
     note = fields.Char()
     is_move = fields.Boolean()
 
-    
+    # @api.multi
     def transfer_product_quantity(self):
         tender_delivery_id = self.env['tender.delivered.quantity']
         tender_search_id = tender_delivery_id.search([('tender_sales_id', '=', self.id)])

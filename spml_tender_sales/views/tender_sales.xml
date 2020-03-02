@@ -30,7 +30,6 @@
             <field name="model">tender.sales</field>
             <field name="arch" type="xml">
                 <form>
-
                     <sheet>
                         <group>
                             <group>
