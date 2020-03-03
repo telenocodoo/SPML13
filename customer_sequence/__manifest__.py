@@ -22,7 +22,7 @@
 
 {
     'name': "Customer Sequence",
-    'version': '12.0.1.0.0',
+    'version': '13.0.1.0.0',
     'summary': """Unique Customer Code""",
     'description': """
        Each customer have unique number code
