@@ -37,7 +37,7 @@ class ResPartner(models.Model):
         company_seq = self.env['res.users'].browse(self._uid).company_id
         if res.customer_rank and res.unique_id == '/':
 
-        company_seq = self.env.company
+            company_seq = self.env.company
         if res.customer_rank > 0 and res.unique_id == '/':
 
             if company_seq.next_code:
