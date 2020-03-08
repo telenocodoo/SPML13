@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_print_arabic,access_print_arabic,model_print_arabic,,1,0,0,0
