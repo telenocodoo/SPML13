@@ -1,0 +1,26 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="res_partner_form_view_inherit">
+            <field name="name">res.partner</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="account_reports.partner_view_buttons"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='open_partner_ledger']" position="attributes">
+                    <attribute name="string">Customer statement</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <!--<record id="account_reports.action_account_report_partner_ledger" model="ir.actions.client">-->
+            <!--<field name="name">Customer statement</field>-->
+        <!--</record>-->
+
+        <!--<menuitem id="account_reports.menu_action_account_report_partner_ledger"-->
+                  <!--name="Partner Ledgerrrrrrrrrrrrrrrrr"-->
+                  <!--action="action_account_report_partner_ledger"-->
+                  <!--parent="account_reports_partners_reports_menu"-->
+                  <!--groups="account.group_account_user"/>-->
+
+
+    </data>
+</odoo>

@@ -73,19 +73,27 @@ class MrpProduction(models.Model):
     # @api.multi
     def button_check_testing(self):
         team_id = self.env['quality.alert.team'].search([])[0]
+        quality_test_type_id = self.env['quality.point.test_type'].search([])[0]
+        print(team_id)
+        print(quality_test_type_id)
         qc_id = self.env['quality.check'].create(
             {
                 'product_id': self.product_id.id,
                 'mrp_production_id': self.id,
                 'team_id': team_id.id,
+                'test_type_id': quality_test_type_id.id if quality_test_type_id else False,
             }
         )
-        qc_id.test_line_ids = {}
+        print(qc_id)
+        qc_id.test_line_ids = False
         old_lines = self.env['quality.check.test'].search([('product_id', '=', self.product_id.id)])
         new_lines = self.env['quality.test.lines']
         if old_lines:
+            print("11111111111")
             for record in old_lines:
+                print("1111111111122222222222")
                 for line in record.quality_test_ids:
+                    print("11111111111333333333333333")
                     res = {
                             'quality_test_id': qc_id.id,
                             'question_id': line.question_id.id,
@@ -94,6 +102,8 @@ class MrpProduction(models.Model):
                             'q_to': line.q_to,
                             'specification': line.specification,
                         }
+                    print("1111111111144444444444444")
                     new_lines.create(res)
+        print("11111111111555555555555555555555")
         self.write({'state': 'test'})
 
