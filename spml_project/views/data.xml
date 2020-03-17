@@ -58,8 +58,10 @@
             </field>
         </record>
         
+        <delete model="ir.ui.menu" id="account.menu_finance_entries"/>
         
-<!--         <menuitem id="menu_finance_entries" name="Accounting" parent="menu_finance" sequence="4" groups="account.group_account_user"/> -->
+        
+        <menuitem id="menu_finance_entries" name="Accounting" parent="menu_finance" sequence="4" groups="account.group_account_user"/>
 
     </data>
 </odoo>
