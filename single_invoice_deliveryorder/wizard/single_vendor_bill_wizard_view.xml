@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form view of Merge Sale order -->
+    <record id="view_create_single_vendor_bill" model="ir.ui.view">
+        <field name="name">single.vendor.bill.form</field>
+        <field name="model">single.vendor.bill</field>
+        <field name="arch" type="xml">
+             <form string="Create Single Vendor Bill">
+                <separator string="Are you sure you want to create single vendor bill of selected orders?"/>
+                <footer>
+                    <button name="create_return_vendor_bill" string="Yes" type="object"
+                    class="btn-primary"/>
+                    <button string="No" class="btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action of Merge Sale Order -->
+    <record id="action_view_create_single_vendor_bill" model="ir.actions.act_window">
+        <field name="name">Create Single Vendor Bill</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">single.vendor.bill</field>
+<!--        <field name="view_type">form</field>-->
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+
+    <record id="action_view_sale_advance_payment_inv_12" model="ir.actions.act_window">
+            <field name="name">Single Invoice</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">single.vendor.bill</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="binding_model_id" ref="stock.model_stock_picking" />
+            <field name="binding_view_types">list</field>
+            <field name="view_id" ref="view_create_single_vendor_bill"/>
+        </record>
+
+
+</odoo>
