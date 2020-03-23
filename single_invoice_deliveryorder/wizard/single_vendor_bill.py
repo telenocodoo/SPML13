@@ -112,9 +112,9 @@ class SingleVendorBill(models.TransientModel):
 				if order.state not in ('assigned'):
 					order.invoice_status = 'no'
 					continue
-				if any(float_compare(line.quantity_done, line.product_qty if line.product_id.purchase_method == 'assigned' else line.product_uom_qty, precision_digits=precision) == -1 for line in order.move_ids_without_package):
+				if any(float_compare(line.quantity_done, line.product_qty if line.state == 'assigned' else line.product_uom_qty, precision_digits=precision) == -1 for line in order.move_ids_without_package):
 					order.invoice_status = 'to invoice'
-				elif all(float_compare(line.quantity_done, line.product_qty if line.product_id.purchase_method == 'assigned' else line.product_uom_qty, precision_digits=precision) >= 0 for line in order.move_ids_without_package):
+				elif all(float_compare(line.quantity_done, line.product_qty if line.state == 'assigned' else line.product_uom_qty, precision_digits=precision) >= 0 for line in order.move_ids_without_package):
 					order.invoice_status = 'invoiced'
 				else:
 					order.invoice_status = 'no'
