@@ -166,7 +166,7 @@ class MRPMaterial(models.Model):
                 ('name', '=', 'Request Raw Material')],limit=1)
             product_car = self.env['product.product'].search([
                 ('id', '=', company.product_id.id)], limit=1)
-            print(dropship_picking_type.name)
+
             dropship_vals.append({
                 'name': 'Request Raw Material',
                 'warehouse_id':self.env.user.company_id.id,
@@ -177,23 +177,69 @@ class MRPMaterial(models.Model):
                 'sequence_code': 'RRM',
 
             })
-            if dropship_vals:
+            if not dropship_picking_type:
+                print("Inside")
 
                 self.env['stock.picking.type'].create(dropship_vals)
-                # outgoing_shipment = self.env['stock.picking'].create({
-                #     'picking_type_id': dropship_picking_type.id,
-                #     'location_id': self.env.ref('stock.stock_location_stock').id,
-                #     'location_dest_id': self.env.ref('stock.stock_location_customers').id,
-                #     'state':'confirmed',
-                #     'move_lines': [(0, 0, {
-                #         'name': 'Request Raw Material',
-                #         'product_id': company.product_id.id,
-                #         'product_uom_qty': company.product_qty,
-                #         'product_uom': product_car.uom_id.id,
-                #         'location_id': self.env.ref('stock.stock_location_stock').id,
-                #         'location_dest_id': self.env.ref('stock.stock_location_customers').id})]
-                # })
-                # outgoing_shipment.action_confirm()
+                picking = self.env['stock.picking'].create({
+                    'location_id': self.env.ref('stock.stock_location_suppliers').id,
+                    'location_dest_id': self.env.ref('stock.stock_location_customers').id,
+                    'partner_id': self._uid,
+                    'picking_type_id': dropship_picking_type.id,
+                    'immediate_transfer': True,
+                })
+                # print(picking)
+                for i in company.move_raw_ids:
+                    # print(i.product_id.name)
+
+                    move_receipt_1 = self.env['stock.move'].create({
+                        'name': i.name,
+                        'product_id': i.product_id.id,
+                        'product_uom_qty': i.product_qty,
+                        'quantity_done': company.product_qty,
+                        'product_uom': i.product_id.uom_id.id,
+                        'picking_id': picking.id,
+                        'picking_type_id': dropship_picking_type.id,
+                        'location_id': self.env.ref('stock.stock_location_suppliers').id,
+                        'location_dest_id': self.env.ref('stock.stock_location_customers').id,
+                    })
+                    picking.action_confirm()
+
+            else:
+                print("else")
+                print(dropship_picking_type.name)
+                picking = self.env['stock.picking'].create({
+                    'location_id': self.env.ref('stock.stock_location_suppliers').id,
+                    'location_dest_id': self.env.ref('stock.stock_location_customers').id,
+                    'partner_id': self._uid,
+                    'picking_type_id': dropship_picking_type.id,
+                    'immediate_transfer': True,
+                })
+                for i in company.move_raw_ids:
+                    # print(i.product_id.name)
+
+                    move_receipt_1 = self.env['stock.move'].create({
+                        'name': i.name,
+                        'product_id': i.product_id.id,
+                        'product_uom_qty': i.product_qty,
+                        'quantity_done': company.product_qty,
+                        'product_uom': i.product_id.uom_id.id,
+                        'picking_id': picking.id,
+                        'picking_type_id': dropship_picking_type.id,
+                        'location_id': self.env.ref('stock.stock_location_suppliers').id,
+                        'location_dest_id': self.env.ref('stock.stock_location_customers').id,
+                    })
+                    print(move_receipt_1)
+                    # move_line_paw = self.env['stock.move.line'].create({
+                    #     'product_id': i.product_id.id,
+                    #     'product_uom_id': i.product_id.uom_id.id,
+                    #     'picking_id': picking.id,
+                    #     'qty_done': company.product_qty,
+                    #     'location_id': self.env.ref('stock.stock_location_suppliers').id,
+                    #     'location_dest_id': self.env.ref('stock.stock_location_customers').id,
+                    # })
+                    # print('l',l)
+                    picking.action_confirm()
 
     def button_qc_sample(self):
         self.ensure_one()
@@ -213,4 +259,18 @@ class MRPMaterial(models.Model):
         }
 
 
+
+class StockScrap(models.Model):
+    _inherit = 'stock.scrap'
+
+
+    def _get_default_scrap_location_id(self):
+        company_id = self.env.context.get('default_company_id') or self.env.company.id
+        return self.env['stock.location'].search([('scrap_location', '=', True), ('company_id', 'in', [company_id, False])], limit=1).id
+
+
+    scrap_location_id = fields.Many2one(
+        'stock.location', 'Scrap Location', default=_get_default_scrap_location_id,
+        domain="[('company_id', 'in', [company_id, False])]", required=True,
+        states={'done': [('readonly', True)]}, check_company=True)
 
