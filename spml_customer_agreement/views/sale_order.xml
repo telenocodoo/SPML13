@@ -1,0 +1,23 @@
+<odoo>
+    <data>
+
+        <record id="sale_order_form_view_inherit" model="ir.ui.view" >
+            <field name="name">sale.order</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="customer_agreement_id" />
+                </xpath>
+                <xpath expr="//field[@name='order_line']//tree//field[@name='name']" position="after">
+                    <field name="customer_agreement_id" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']" position="attributes">
+                    <attribute name="context">{'default_customer_agreement_id': customer_agreement_id}</attribute>
+<!--                    <field name="test" nolabel="1" context="{'default_product_id': active_id, 'default_only_with_stock': True}">-->
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>
