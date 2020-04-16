@@ -9,6 +9,7 @@ class SaleOrderLine(models.Model):
     customer_agreement_id = fields.Many2one("customer.tender.agreement")
     customer_agreement_line_id = fields.Many2one("customer.tender.agreement.line")
 
+    @api.depends('customer_agreement_id')
     @api.onchange('product_id')
     def _onchange_customer_agreement_id(self):
         p = []
@@ -18,7 +19,7 @@ class SaleOrderLine(models.Model):
                     p.append(i.product_id.id)
                 # print("44444444444",i.product_id.name)
                 # print({'domain': {'product_id':[('product_id','in',p)]}})
-        return {'domain': {'product_id':[('id', 'in', p)]}}
+            return {'domain': {'product_id':[('id', 'in', p)]}}
 
     @api.onchange('product_uom_qty')
     def _onchange_product_uom_qty(self):
