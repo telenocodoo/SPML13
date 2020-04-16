@@ -299,19 +299,19 @@ class MRPMaterial(models.Model):
                 'location_dest_id': self.env.ref('stock.picking_type_internal').id,
                 'picking_type_id': self.env.ref('stock.picking_type_internal').id,
             })
-        for i in company:
+            for i in company:
 
-            move_receipt_1 = self.env['stock.move'].create({
-                'name': i.name,
-                'product_id': i.product_id.id,
-                'product_uom_qty': total,
-                'quantity_done': total,
-                'product_uom': i.product_id.uom_id.id,
-                'picking_id': picking.id,
-                'picking_type_id': self.env.ref('stock.picking_type_internal').id,
-                'location_id': self.env.ref('stock.stock_location_stock').id,
-                'location_dest_id': self.env.ref('stock.stock_location_stock').id,
-            })
+                move_receipt_1 = self.env['stock.move'].create({
+                    'name': i.name,
+                    'product_id': i.product_id.id,
+                    'product_uom_qty': company.product_qty-total,
+                    'quantity_done': company.product_qty-total,
+                    'product_uom': i.product_id.uom_id.id,
+                    'picking_id': picking.id,
+                    'picking_type_id': self.env.ref('stock.picking_type_internal').id,
+                    'location_id': self.env.ref('stock.stock_location_stock').id,
+                    'location_dest_id': self.env.ref('stock.stock_location_stock').id,
+                })
                 # picking.action_confirm()
 
 
