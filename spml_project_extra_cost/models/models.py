@@ -153,7 +153,7 @@ class MRPMaterial(models.Model):
     _inherit = 'mrp.production'
     _description = 'MRP Raw Material'
 
-    state = fields.Selection(selection_add=[('raw', 'Request Raw Material'),('qc', 'QC Sample')])
+    state = fields.Selection(selection_add=[('raw', 'Request Raw Material'),('qc', 'QC Sample'),('transfer', 'Transfer')])
 
     def action_request(self):
         dropship_vals = []
@@ -163,7 +163,8 @@ class MRPMaterial(models.Model):
             sequence = self.env['ir.sequence'].search([
                 ('code', '=', 'stock.dropshipping')])
             dropship_picking_type = self.env['stock.picking.type'].search([
-                ('name', '=', 'Request Raw Material')],limit=1)
+                ('name', '=', 'Request Raw Material')], limit=1)
+
             product_car = self.env['product.product'].search([
                 ('id', '=', company.product_id.id)], limit=1)
 
@@ -181,6 +182,8 @@ class MRPMaterial(models.Model):
                 print("Inside")
 
                 self.env['stock.picking.type'].create(dropship_vals)
+                dropship_picking_type = self.env['stock.picking.type'].search([
+                    ('name', '=', 'Request Raw Material')], limit=1)
                 picking = self.env['stock.picking'].create({
                     'location_id': self.env.ref('stock.stock_location_suppliers').id,
                     'location_dest_id': self.env.ref('stock.stock_location_customers').id,
@@ -243,8 +246,9 @@ class MRPMaterial(models.Model):
 
     def button_qc_sample(self):
         self.ensure_one()
-        self.write({'state': 'qc'})
+        # self.write({'state': 'qc'})
         print("QC Sample")
+
         return {
             'name': _('QC Sample'),
             'view_mode': 'form',
@@ -257,6 +261,59 @@ class MRPMaterial(models.Model):
                         },
             'target': 'new',
         }
+
+
+    def action_internal(self):
+        self.ensure_one()
+        view = self.env.ref('stock.view_picking_form')
+        products = self.env['product.product']
+        scrapobj = self.env['stock.scrap'].search([ ('production_id', '=', self.id),('product_id','=',self.product_id.id)])
+        location = self.env['stock.location'].search([('usage', '=', 'internal')])
+        for i in location:
+            print(i.name)
+
+
+        total=0
+        for i in scrapobj:
+            total=total+i.scrap_qty
+
+        print(total)
+
+        # return {
+        #     'name': _('Create Internal Transfer'),
+        #     'view_mode': 'form',
+        #     'res_model': 'stock.picking',
+        #     'view_id': view.id,
+        #     'views': [(view.id, 'form')],
+        #     'type': 'ir.actions.act_window',
+        #     'context': {'default_picking_type_id': self.env.ref('stock.picking_type_internal').id,
+        #                 'default_company_id': self.company_id.id},
+        #     'target': 'new',
+        # }
+
+
+        for company in self:
+            # self.write({'state': 'transfer'})
+            picking = self.env['stock.picking'].create({
+                'location_id': self.env.ref('stock.picking_type_internal').id,
+                'location_dest_id': self.env.ref('stock.picking_type_internal').id,
+                'picking_type_id': self.env.ref('stock.picking_type_internal').id,
+            })
+        for i in company:
+
+            move_receipt_1 = self.env['stock.move'].create({
+                'name': i.name,
+                'product_id': i.product_id.id,
+                'product_uom_qty': total,
+                'quantity_done': total,
+                'product_uom': i.product_id.uom_id.id,
+                'picking_id': picking.id,
+                'picking_type_id': self.env.ref('stock.picking_type_internal').id,
+                'location_id': self.env.ref('stock.stock_location_stock').id,
+                'location_dest_id': self.env.ref('stock.stock_location_stock').id,
+            })
+                # picking.action_confirm()
+
 
 
 
