@@ -1,6 +1,21 @@
 <odoo>
     <data>
 
+
+          <record id="isr_stock_picking_invoice_form" model="ir.ui.view">
+            <field name="name">account.move.form</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+               <xpath expr="//field[@name='location_id']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', 'in', ['assigned', 'done'])]}</attribute>
+            </xpath>
+                    <xpath expr="//field[@name='location_dest_id']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', 'in', ['assigned', 'done'])]}</attribute>
+            </xpath>
+            </field>
+        </record>
+
         <record id="isr_invoice_form" model="ir.ui.view">
             <field name="name">account.move.form</field>
             <field name="model">account.move</field>
@@ -71,6 +86,10 @@
             <field name="model">mrp.production</field>
             <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
             <field name="arch" type="xml">
+
+                  <xpath expr="//field[@name='origin']" position="attributes">
+                <attribute name="attrs">{'required': [('state', 'in', ['draft'])]}</attribute>
+            </xpath>
                 <xpath expr="//form//header//field[@name='state']" position="replace">
                     <field name="state" widget="statusbar" statusbar_visible="draft,raw,qc,confirmed,assigned,done,transfer"/>
                 </xpath>
