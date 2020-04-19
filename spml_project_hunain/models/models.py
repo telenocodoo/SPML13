@@ -1,4 +1,5 @@
 from odoo import models, fields, api,_
+from odoo.exceptions import AccessError, UserError
 
 class BankAccount(models.Model):
     _inherit = 'account.bank.statement.line'
@@ -188,6 +189,7 @@ class MRPMaterial(models.Model):
                     'location_id': self.env.ref('stock.stock_location_suppliers').id,
                     'location_dest_id': self.env.ref('stock.stock_location_customers').id,
                     'partner_id': self._uid,
+                    'origin': self.origin,
                     'picking_type_id': dropship_picking_type.id,
                     'immediate_transfer': True,
                 })
@@ -215,6 +217,7 @@ class MRPMaterial(models.Model):
                     'location_id': self.env.ref('stock.stock_location_suppliers').id,
                     'location_dest_id': self.env.ref('stock.stock_location_customers').id,
                     'partner_id': self._uid,
+                    'origin': self.origin,
                     'picking_type_id': dropship_picking_type.id,
                     'immediate_transfer': True,
                 })
@@ -268,32 +271,12 @@ class MRPMaterial(models.Model):
         view = self.env.ref('stock.view_picking_form')
         products = self.env['product.product']
         scrapobj = self.env['stock.scrap'].search([ ('production_id', '=', self.id),('product_id','=',self.product_id.id)])
-        location = self.env['stock.location'].search([('usage', '=', 'internal')])
-        for i in location:
-            print(i.name)
-
 
         total=0
         for i in scrapobj:
             total=total+i.scrap_qty
-
-        print(total)
-
-        # return {
-        #     'name': _('Create Internal Transfer'),
-        #     'view_mode': 'form',
-        #     'res_model': 'stock.picking',
-        #     'view_id': view.id,
-        #     'views': [(view.id, 'form')],
-        #     'type': 'ir.actions.act_window',
-        #     'context': {'default_picking_type_id': self.env.ref('stock.picking_type_internal').id,
-        #                 'default_company_id': self.company_id.id},
-        #     'target': 'new',
-        # }
-
-
         for company in self:
-            # self.write({'state': 'transfer'})
+            self.write({'state': 'transfer'})
             picking = self.env['stock.picking'].create({
                 'location_id': self.env.ref('stock.picking_type_internal').id,
                 'location_dest_id': self.env.ref('stock.picking_type_internal').id,
@@ -312,7 +295,31 @@ class MRPMaterial(models.Model):
                     'location_id': self.env.ref('stock.stock_location_stock').id,
                     'location_dest_id': self.env.ref('stock.stock_location_stock').id,
                 })
-                # picking.action_confirm()
+            picking.action_confirm()
+
+    def action_confirm(self):
+        sequence = self.env['stock.picking'].search([
+            ('origin', '=', self.origin)],limit=1)
+        print(sequence.origin)
+
+        if sequence.state in ['done']:
+            self._check_company()
+            for production in self:
+                if not production.move_raw_ids:
+                    raise UserError(_("Add some materials to consume before marking this MO as to do."))
+                for move_raw in production.move_raw_ids:
+                    move_raw.write({
+                        'group_id': production.procurement_group_id.id,
+                        'unit_factor': move_raw.product_uom_qty / production.product_qty,
+                        'reference': production.name,  # set reference when MO name is different than 'New'
+                    })
+                production._generate_finished_moves()
+                production.move_raw_ids._adjust_procure_method()
+                (production.move_raw_ids | production.move_finished_ids)._action_confirm()
+            return True
+        else:
+            raise UserError(_("Request for Raw Material is not Validated yet."))
+
 
 
 
