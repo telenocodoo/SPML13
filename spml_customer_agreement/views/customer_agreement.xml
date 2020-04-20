@@ -30,7 +30,7 @@
                                         <field name="quantity" />
                                         <field name="uom_id" />
                                         <field name="unit_price" string="Sale Price"/>
-                                        <field name="delivery_qty" readonly="1"/>
+                                        <field name="delivery_qty" string="Reserved Qty" readonly="1"/>
                                         <field name="remain_qty" />
                                     </tree>
                                 </field>
