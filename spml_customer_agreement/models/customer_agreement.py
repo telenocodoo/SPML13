@@ -11,10 +11,6 @@ class CustomerTenderAgreement(models.Model):
     start_date = fields.Date()
     end_date = fields.Date()
     partner_id = fields.Many2one('res.partner')
-    # vehicle_id = fields.Many2one('fleet.vehicle', 'Vehicle/Trailer')
-    # next_implementation_date = fields.Datetime()
-    # final_result = fields.Selection(selection=[('Approved', 'Approved'), ('Failed', 'Failed')])
-    # observation = fields.Text()
     product_ids = fields.One2many('customer.tender.agreement.line', 'agreement_id')
 
 
