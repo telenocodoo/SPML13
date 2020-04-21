@@ -337,4 +337,3 @@ class StockScrap(models.Model):
         'stock.location', 'Scrap Location', default=_get_default_scrap_location_id,
         domain="[('company_id', 'in', [company_id, False])]", required=True,
         states={'done': [('readonly', True)]}, check_company=True)
-
