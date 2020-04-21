@@ -208,7 +208,7 @@ class MRPMaterial(models.Model):
                         'location_id': self.env.ref('stock.stock_location_suppliers').id,
                         'location_dest_id': self.env.ref('stock.stock_location_customers').id,
                     })
-                    picking.action_confirm()
+                   
 
             else:
                 print("else")
@@ -245,7 +245,7 @@ class MRPMaterial(models.Model):
                     #     'location_dest_id': self.env.ref('stock.stock_location_customers').id,
                     # })
                     # print('l',l)
-                    picking.action_confirm()
+                   
 
     def button_qc_sample(self):
         self.ensure_one()
