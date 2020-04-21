@@ -16,6 +16,10 @@
                     <attribute name="context">{'default_customer_agreement_id': customer_agreement_id}</attribute>
 <!--                    <field name="test" nolabel="1" context="{'default_product_id': active_id, 'default_only_with_stock': True}">-->
                 </xpath>
+                <xpath expr="//field[@name='partner_id']" position="attributes">
+<!--                    <attribute name="context">{'search_default_customer': 1,'res_partner_search_mode': 'customer', 'default_is_company': True, 'default_customer_rank': 1}</attribute>-->
+                    <attribute name="domain">[('customer_rank','=',1),'|',('is_company','=','company_is'),('is_company','=',False)]</attribute>
+                </xpath>
             </field>
         </record>
 
