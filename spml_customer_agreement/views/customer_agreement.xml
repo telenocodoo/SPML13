@@ -16,7 +16,7 @@
                             </h1>
                         </div>
                         <group>
-                            <field name="partner_id" string="Customer Name"/>
+                            <field name="partner_id" domain="[('customer_rank','=',1),'|',('is_company','=','company_is'),('is_company','=',False)]" string="Customer Name"/>
                             <field name="start_date" />
                             <field name="end_date" />
                         </group>
@@ -60,7 +60,7 @@
 
 
         <record id="customer_tender_agreement_action" model="ir.actions.act_window">
-            <field name="name">customer tender agreement</field>
+            <field name="name">Customer Tender Agreement</field>
             <field name="res_model">customer.tender.agreement</field>
             <field name="type">ir.actions.act_window</field>
             <field name="view_mode">tree,form</field>
@@ -68,14 +68,14 @@
 
 
         <menuitem id="customer_tender_agreement_root"
-                  name="customer tender agreement"
+                  name="Customer Tender Agreement"
         />
         <menuitem id="customer_tender_agreement_menu"
-                  name="customer tender agreement"
+                  name="Customer Tender Agreement"
                   parent="customer_tender_agreement_root"
         />
         <menuitem id="customer_tender_agreement_menu_action"
-                  name="customer tender agreement"
+                  name="Customer Tender Agreement"
                   action="customer_tender_agreement_action"
                   parent="customer_tender_agreement_menu"
         />
