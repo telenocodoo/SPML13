@@ -1,5 +1,6 @@
 from odoo import models, fields, api,_
 from odoo.exceptions import AccessError, UserError
+from datetime import datetime
 
 class BankAccount(models.Model):
     _inherit = 'account.bank.statement.line'
@@ -154,13 +155,15 @@ class MRPMaterial(models.Model):
     _inherit = 'mrp.production'
     _description = 'MRP Raw Material'
 
-    state = fields.Selection(selection_add=[('raw', 'Request Raw Material'),('qc', 'QC Sample'),('transfer', 'Transfer')])
+    state = fields.Selection(selection_add=[('raw', 'Request Raw Material'),('qc', 'QC Sample'),('transfer', 'QC Check')])
 
     def action_request(self):
         dropship_vals = []
         print("HEllo")
         self.write({'state': 'raw'})
         for company in self:
+            location_id = self.env['stock.location'].search([('usage', '=', 'production')])
+            print("RRW",location_id.name)
             sequence = self.env['ir.sequence'].search([
                 ('code', '=', 'stock.dropshipping')])
             dropship_picking_type = self.env['stock.picking.type'].search([
@@ -174,20 +177,21 @@ class MRPMaterial(models.Model):
                 'warehouse_id':self.env.user.company_id.id,
                 'sequence_id': sequence.id,
                 'code': 'internal',
-                'default_location_src_id': self.env.ref('stock.stock_location_suppliers').id,
-                'default_location_dest_id': self.env.ref('stock.stock_location_customers').id,
+                'default_location_src_id': location_id.id,
+                'default_location_dest_id': self.location_dest_id.id,
                 'sequence_code': 'RRM',
 
             })
             if not dropship_picking_type:
                 print("Inside")
 
+
                 self.env['stock.picking.type'].create(dropship_vals)
                 dropship_picking_type = self.env['stock.picking.type'].search([
                     ('name', '=', 'Request Raw Material')], limit=1)
                 picking = self.env['stock.picking'].create({
-                    'location_id': self.env.ref('stock.stock_location_suppliers').id,
-                    'location_dest_id': self.env.ref('stock.stock_location_customers').id,
+                    'location_id': location_id.id,
+                    'location_dest_id': self.location_dest_id.id,
                     'partner_id': self._uid,
                     'origin': self.origin,
                     'picking_type_id': dropship_picking_type.id,
@@ -205,17 +209,18 @@ class MRPMaterial(models.Model):
                         'product_uom': i.product_id.uom_id.id,
                         'picking_id': picking.id,
                         'picking_type_id': dropship_picking_type.id,
-                        'location_id': self.env.ref('stock.stock_location_suppliers').id,
-                        'location_dest_id': self.env.ref('stock.stock_location_customers').id,
+                        'location_id': location_id.id,
+                        'location_dest_id': self.location_dest_id.id,
                     })
                     picking.action_confirm()
 
             else:
                 print("else")
+                location_id = self.env['stock.location'].search([('usage', '=', 'production')])
                 print(dropship_picking_type.name)
                 picking = self.env['stock.picking'].create({
-                    'location_id': self.env.ref('stock.stock_location_suppliers').id,
-                    'location_dest_id': self.env.ref('stock.stock_location_customers').id,
+                    'location_id': location_id.id,
+                    'location_dest_id': self.location_dest_id.id,
                     'partner_id': self._uid,
                     'origin': self.origin,
                     'picking_type_id': dropship_picking_type.id,
@@ -232,8 +237,8 @@ class MRPMaterial(models.Model):
                         'product_uom': i.product_id.uom_id.id,
                         'picking_id': picking.id,
                         'picking_type_id': dropship_picking_type.id,
-                        'location_id': self.env.ref('stock.stock_location_suppliers').id,
-                        'location_dest_id': self.env.ref('stock.stock_location_customers').id,
+                        'location_id': location_id.id,
+                        'location_dest_id': self.location_dest_id.id,
                     })
                     print(move_receipt_1)
                     # move_line_paw = self.env['stock.move.line'].create({
@@ -267,35 +272,102 @@ class MRPMaterial(models.Model):
 
 
     def action_internal(self):
-        self.ensure_one()
-        view = self.env.ref('stock.view_picking_form')
-        products = self.env['product.product']
-        scrapobj = self.env['stock.scrap'].search([ ('production_id', '=', self.id),('product_id','=',self.product_id.id)])
+        values_to_create = []
+        active_id = self.id
+        print("active_id",active_id)
 
-        total=0
+        for production in self:
+            points = self.env['quality.point'].search([('title', '=', 'RRM Quality Points')],limit=1)
+            if points:
+                points = self.env['quality.point'].search([('title','=','RRM Quality Points')],limit=1)
+                picking_type_id = self.env['stock.picking.type'].search([('sequence_code', '=', 'RRM')],limit=1)
+                test_type_id = self.env['quality.point.test_type'].search([('name', '=', 'Pass - Fail')])
+                team_id = self.env['quality.alert.team'].search([('name', '=', 'Main Quality Team')])
+                name = self.name
+                picking_id = self.env['stock.picking'].search([('origin', '=', self.origin)])
+                quality_check_data = {
+                    'picking_id': picking_id.id,
+                    'product_id': self.product_id.id,
+                    'point_id': points.id,
+                    'company_id': self.company_id.id,
+                    'team_id': team_id.id,
+                    'test_type_id': test_type_id.id,
+                    'origin': self.origin,
+                }
+                k = self.env['quality.check'].create(quality_check_data)
+            else:
+                picking_type_id=self.env['stock.picking.type'].search([('sequence_code','=','RRM')])
+                test_type_id = self.env['quality.point.test_type'].search([('name','=','Pass - Fail')])
+
+                l=self.env['quality.point'].create({
+                    'product_id': self.product_id.id,
+                    'product_tmpl_id': self.product_id.product_tmpl_id.id,
+                    'title': "RRM Quality Points",
+                    'picking_type_id': picking_type_id.id,
+                    'test_type_id': test_type_id.id
+                })
+
+                team_id = self.env['quality.alert.team'].search([('name', '=', 'Main Quality Team')])
+
+                name=self.name
+                picking_id = self.env['stock.picking'].search([('origin', '=', self.origin)],limit=1)
+
+                quality_check_data = {
+                    'picking_id': picking_id.id,
+                    'product_id': self.product_id.id,
+                    'point_id':points.id,
+                    'company_id': self.company_id.id,
+                    'team_id': team_id.id,
+                    'test_type_id': test_type_id.id,
+                    'origin': self.origin,
+                }
+                k=self.env['quality.check'].create(quality_check_data)
+
+
+
+    def action_pass(self):
+        scrapobj = self.env['stock.scrap'].search(
+            [('production_id', '=', self.id), ('product_id', '=', self.product_id.id)])
+
+        location_id = self.env['stock.location'].search([('usage', '=', 'production')])
+
+        total = 0
         for i in scrapobj:
-            total=total+i.scrap_qty
+            total = total + i.scrap_qty
         for company in self:
             self.write({'state': 'transfer'})
             picking = self.env['stock.picking'].create({
-                'location_id': self.env.ref('stock.picking_type_internal').id,
-                'location_dest_id': self.env.ref('stock.picking_type_internal').id,
+                'location_id': location_id.id,
+                'location_dest_id': company.location_dest_id.id,
                 'picking_type_id': self.env.ref('stock.picking_type_internal').id,
+                'origin': self.origin,
             })
             for i in company:
-
                 move_receipt_1 = self.env['stock.move'].create({
                     'name': i.name,
                     'product_id': i.product_id.id,
-                    'product_uom_qty': company.product_qty-total,
-                    'quantity_done': company.product_qty-total,
+                    'product_uom_qty': company.product_qty - total,
+                    'quantity_done': company.product_qty - total,
                     'product_uom': i.product_id.uom_id.id,
                     'picking_id': picking.id,
                     'picking_type_id': self.env.ref('stock.picking_type_internal').id,
-                    'location_id': self.env.ref('stock.stock_location_stock').id,
-                    'location_dest_id': self.env.ref('stock.stock_location_stock').id,
+                    'location_id': location_id.id,
+                    'location_dest_id': company.location_dest_id.id,
                 })
+                # k=self.env['stock.move.line'].create({
+                #     'move_id': move_receipt_1.id,
+                #     'picking_id': move_receipt_1.picking_id.id,
+                #     'product_id': move_receipt_1.product_id.id,
+                #     'location_id': move_receipt_1.location_id.id,
+                #     'location_dest_id': move_receipt_1.location_dest_id.id,
+                #     'product_uom_qty': company.product_qty - total,
+                #     'product_uom_id':move_receipt_1.product_id.uom_id.id,
+                #     'qty_done': company.product_qty - total,
+                # })
+
             picking.action_confirm()
+            picking.button_validate()
+
 
     def action_confirm(self):
         sequence = self.env['stock.picking'].search([
@@ -338,3 +410,48 @@ class StockScrap(models.Model):
         domain="[('company_id', 'in', [company_id, False])]", required=True,
         states={'done': [('readonly', True)]}, check_company=True)
 
+class QualityCheck(models.Model):
+    _inherit = "quality.check"
+
+    origin=fields.Char("Origin")
+
+
+
+    def do_fail(self):
+        mrpobj = self.env['mrp.production'].search([('origin', '=', self.origin)])
+        print(mrpobj.picking_type_id.name)
+        self.write({
+            'quality_state': 'fail',
+            'user_id': self.env.user.id,
+            'control_date': datetime.now()})
+        self.redirect_after_pass_fail()
+        scrap = self.env['stock.scrap'].create({
+            'product_id': self.product_id.id,
+            'product_uom_id': self.product_id.uom_id.id,
+            'scrap_qty': mrpobj.product_qty,
+            'picking_id': self.picking_id.id,
+            'origin': self.origin
+        })
+        scrap.action_validate()
+        # return {
+        #     'name': _('QC Sample'),
+        #     'view_mode': 'form',
+        #     'res_model': 'stock.scrap',
+        #     'view_id': self.env.ref('stock.stock_scrap_form_view2').id,
+        #     'type': 'ir.actions.act_window',
+        #     'context': {'default_product_id': self.product_id.id,
+        #                 'default_company_id': self.company_id.id
+        #                 },
+        #     'target': 'new',
+        # }
+
+
+    def do_pass(self):
+        mrpobj = self.env['mrp.production'].search([('origin', '=',self.origin)])
+
+        print("mrpobj",mrpobj.origin)
+        mrpobj.action_pass()
+        self.write({'quality_state': 'pass',
+                    'user_id': self.env.user.id,
+                    'control_date': datetime.now()})
+        return self.redirect_after_pass_fail()
