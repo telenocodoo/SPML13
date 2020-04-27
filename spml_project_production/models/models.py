@@ -241,7 +241,7 @@ class MRPMaterial(models.Model):
                         'product_uom': i.product_id.uom_id.id,
                         'picking_id': picking.id,
                         'picking_type_id': dropship_picking_type.id,
-                        'location_id': self.src_location_id.id,
+                        'location_id': src_location_id.id,
                         'location_dest_id': location_id.id,
                     })
                     print(move_receipt_1)
