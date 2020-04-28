@@ -9,6 +9,8 @@ class SaleOrder(models.Model):
 
     def action_confirm(self):
         res = super(SaleOrder, self).action_confirm()
+        if not self.partner_id.is_credit_limit_allowed:
+            return res
         account_move_obj = self.env['account.move'].search([('partner_id', '=', self.partner_id.id),
                                                             ('state', '=', 'posted')])
         if account_move_obj:
@@ -25,6 +27,8 @@ class SaleOrder(models.Model):
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
+
+    is_credit_limit_allowed = fields.Boolean()
 
     def open_partner_ledger(self):
         res = super(ResPartner, self).open_partner_ledger()
