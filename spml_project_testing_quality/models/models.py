@@ -423,9 +423,9 @@ class MRPMaterial(models.Model):
 
 
     def button_mark_done(self):
-            sequence = self.env['quality.check'].search([('origin', '=', self.origin)], limit=1)
-            print(sequence.origin)
-            if sequence.quality_state in ['pass']:
+#             sequence = self.env['quality.check'].search([('origin', '=', self.origin)], limit=1)
+#             print(sequence.origin)
+#             if sequence.quality_state in ['pass']:
                 self.ensure_one()
                 self.action_pass()
                 self._check_company()
@@ -444,8 +444,8 @@ class MRPMaterial(models.Model):
                 })
                 return self.write({'date_finished': fields.Datetime.now()})
 
-            else:
-                raise UserError(_("First process the quality check."))
+#             else:
+#                 raise UserError(_("First process the quality check."))
 
 
 
