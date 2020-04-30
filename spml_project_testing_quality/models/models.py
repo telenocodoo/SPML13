@@ -427,7 +427,7 @@ class MRPMaterial(models.Model):
             print(sequence.origin)
             if sequence.quality_state in ['pass']:
                 self.ensure_one()
-                # self.action_pass()
+                self.action_pass()
                 self._check_company()
                 for wo in self.workorder_ids:
                     if wo.time_ids.filtered(lambda x: (not x.date_end) and (x.loss_type in ('productive', 'performance'))):
