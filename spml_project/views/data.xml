@@ -1,68 +1,8 @@
+
 <odoo>
     <data>
-       
-
-        
 
 
-
-
-         <record id="isr_invoice_form" model="ir.ui.view">
-            <field name="name">account.move.form</field>
-            <field name="model">account.move</field>
-            <field name="inherit_id" ref="account.view_move_form"/>
-            <field name="arch" type="xml">
-                 <xpath expr="//button[@name='action_post']" position="replace">
-                <button name="action_post" string="Post" class="oe_highlight" type="object" groups="account.group_account_manager"/>
-                </xpath>
-                <xpath expr="//button[@name='button_cancel']" position="replace">
-                    <button name="button_cancel" string="Cancel Entry" type="object" groups="account.group_account_manager" attrs="{'invisible' : ['|', ('id', '=', False), ('state', '!=', 'draft')]}"/>
-                </xpath>
-            </field>
-        </record>
-
-
-        <record id="isr_invoice_form_account_bank_statement" model="ir.ui.view">
-            <field name="name">account.move.form</field>
-            <field name="model">account.bank.statement</field>
-            <field name="inherit_id" ref="account.view_bank_statement_form"/>
-            <field name="arch" type="xml">
-
-                <xpath expr="//field[@name='line_ids']/tree/field[@name='partner_id']"
-                       position="after">
-                    <field name="bank_account"/>
-                    <field name="employee_name"/>
-                </xpath>
-                <xpath expr="//field[@name='line_ids']/tree/field[@name='partner_id']" position="attributes">
-                    <attribute name="invisible">True</attribute>
-                </xpath>
-            </field>
-        </record>
-
-
-
-        <record id="isr_purchase_form_account_bank_statement" model="ir.ui.view">
-            <field name="name">purchase.order.form</field>
-            <field name="model">purchase.order</field>
-            <field name="inherit_id" ref="purchase.purchase_order_form"/>
-            <field name="arch" type="xml">
-
-                <xpath expr="//button[@name='button_confirm']" position="replace">
-                    <button name="button_confirm" type="object" states="sent" string="Confirm Order" class="oe_highlight" id="bid_confirm" groups="account.group_account_manager"/>
-                </xpath>
-
-                <xpath expr="//button[@id='draft_confirm']" position="replace">
-
-                  <button name="button_confirm" type="object" states="draft" string="Confirm Order" id="draft_confirm" groups="account.group_account_manager"/>
-                </xpath>
-            </field>
-        </record>
-        
-              <record id="account.menu_finance_entries" model="ir.ui.menu">
-        <field name="active" eval="True"/>
-               <field name="groups_id" eval="[(4, ref('account.group_account_user'))]"/>
-            </record>
-       
     </data>
 </odoo>
 

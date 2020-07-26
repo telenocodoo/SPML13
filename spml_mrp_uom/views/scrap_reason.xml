@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="stock_scrap_form_view_inherit1" model="ir.ui.view" >
+        <field name="name">stock.scrap</field>
+        <field name="model">stock.scrap</field>
+        <field name="inherit_id" ref="stock.stock_scrap_form_view"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="reason_id" attrs="{'readonly':[('state','=','done')]}"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="stock_scrap_form_view_inherit" model="ir.ui.view" >
+        <field name="name">stock.scrap</field>
+        <field name="model">stock.scrap</field>
+        <field name="inherit_id" ref="stock.stock_scrap_form_view2"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='location_id']" position="after">
+                <field name="reason_id" required="1"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="stock_scrap_reason_form_view" model="ir.ui.view" >
+        <field name="name">scrap.reason.form</field>
+        <field name="model">scrap.reason</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name" required="1"/>
+                        <field name="scrap_location_id" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="stock_scrap_reason_tree_view" model="ir.ui.view" >
+        <field name="name">scrap.reason.tree</field>
+        <field name="model">scrap.reason</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="scrap_location_id" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="stock_scrap_reason_action" model="ir.actions.act_window">
+        <field name="name">Scrap Reason</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">scrap.reason</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="stock_scrap_reason_menu"
+              name="Scrap Reason"
+              action="stock_scrap_reason_action"
+              parent="mrp.menu_mrp_manufacturing"
+    />
+
+
+</odoo>
