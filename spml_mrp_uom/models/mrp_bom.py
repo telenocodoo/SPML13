@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError
 
 
 class StockMove(models.Model):
     _inherit = 'stock.move'
 
-    stock_production_lot_id = fields.Many2one('stock.production.lot', string='Lot/Serial')
+    stock_production_lot_id = fields.Many2one('stock.production.lot',
+                                              string='Lot/Serial')
     expiration_date = fields.Date(string='Expiration Date')
 
     @api.onchange('stock_production_lot_id')
@@ -21,33 +21,55 @@ class StockMove(models.Model):
         self.expiration_date = self.stock_production_lot_id.life_date
         return {'domain': domain}
 
+    @api.onchange('product_id')
+    def get_product_number(self):
+        if self:
+            if self.product_id:
+                print(self.stock_production_lot_id)
+                print(self.product_id.name)
+                # print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+        # if self:
+        #     print("1111111111")
+        #     if self.needs_lots:
+        #         print("22222222222")
+        #         lot_id = self.env['stock.production.lot'].\
+        #             search([('product_id.id', '=', self.product_id.id)], limit=1)
+        #
+        #         if lot_id:
+        #             print("33333333")
+        #             print(lot_id)
+        #         print("444444444444")
+                # self.stock_production_lot_id = lot_id.id
+                # self.expiration_date = lot_id.life_date
+        # print("55555555555555")
+
 
 class MrpBom(models.Model):
     _inherit = 'mrp.bom'
 
     qty_per_liter = fields.Float('َQuantity In Liter', default=1)
 
-    @api.model
-    def _bom_find_domain(self, product_tmpl=None, product=None, picking_type=None, company_id=False, bom_type=False):
-        if product:
-            if not product_tmpl:
-                product_tmpl = product.product_tmpl_id
-            domain = ['|', ('product_id', '=', product.id), '&', ('product_id', '=', False),
-                      ('product_tmpl_id', '=', product_tmpl.id)]
-        elif product_tmpl:
-            domain = [('product_tmpl_id', '=', product_tmpl.id)]
-        else:
-            # neither product nor template, makes no sense to search
-            raise UserError(_('You should provide either a product or a product template to search a BoM'))
-        if picking_type:
-            domain += ['|', ('picking_type_id', '=', picking_type.id), ('picking_type_id', '=', False)]
-        if company_id or self.env.context.get('company_id'):
-            domain = domain + ['|', ('company_id', '=', False),
-                               ('company_id', '=', company_id or self.env.context.get('company_id'))]
-        if bom_type:
-            domain += [('type', '=', 'phantom')]
-        # order to prioritize bom with product_id over the one without
-        return domain
+    # @api.model
+    # def _bom_find_domain(self, product_tmpl=None, product=None, picking_type=None, company_id=False, bom_type=False):
+    #     if product:
+    #         if not product_tmpl:
+    #             product_tmpl = product.product_tmpl_id
+    #         domain = ['|', ('product_id', '=', product.id), '&', ('product_id', '=', False),
+    #                   ('product_tmpl_id', '=', product_tmpl.id)]
+    #     elif product_tmpl:
+    #         domain = [('product_tmpl_id', '=', product_tmpl.id)]
+    #     else:
+    #         # neither product nor template, makes no sense to search
+    #         raise UserError(_('You should provide either a product or a product template to search a BoM'))
+    #     if picking_type:
+    #         domain += ['|', ('picking_type_id', '=', picking_type.id), ('picking_type_id', '=', False)]
+    #     if company_id or self.env.context.get('company_id'):
+    #         domain = domain + ['|', ('company_id', '=', False),
+    #                            ('company_id', '=', company_id or self.env.context.get('company_id'))]
+    #     if bom_type:
+    #         domain += [('type', '=', 'phantom')]
+    #     # order to prioritize bom with product_id over the one without
+    #     return domain
 
 
 
@@ -91,11 +113,6 @@ class MrpBom(models.Model):
         #     production_move._set_quantity_done(
         #         float_round(self.qty_producing, precision_rounding=rounding)
         #     )
-
-
-
-
-
 
 
 
@@ -153,6 +170,13 @@ class MrpProduction(models.Model):
     def create(self, values):
         res = super(MrpProduction, self).create(values)
         res['origin'] = values['name']
+        if res['move_raw_ids']:
+            for line in res['move_raw_ids']:
+                lot_id = self.env['stock.production.lot']. \
+                                search([('product_id.id', '=', line.product_id.id)], limit=1)
+                if lot_id:
+                    line.stock_production_lot_id = lot_id.id
+                    line.expiration_date = lot_id.life_date
         return res
 
     def open_produce_product(self):
@@ -173,8 +197,6 @@ class MrpProduction(models.Model):
                 'qty_rate': line.qty_rate,
                 'actual_cost': line.actual_cost,
             })
-        # self.qty_to_produce_in_liter = self.bom_id.qty_per_liter
-        # self.onchange_qty_to_produce()
 
     @api.onchange('product_qty')
     def onchange_product_qty(self):
@@ -213,33 +235,33 @@ class MrpProduction(models.Model):
 
 
 
-    @api.onchange('product_id', 'picking_type_id', 'company_id')
-    def onchange_product_id(self):
-        print("111111111111")
-        """ Finds UoM of changed product. """
-        if not self.product_id:
-            self.bom_id = False
-        else:
-            bom = self.env['mrp.bom']._bom_find(product=self.product_id, picking_type=self.picking_type_id,
-                                                company_id=self.company_id.id)
-            # , bom_type = 'normal'
-            print("111111111111", bom)
-            if bom:
-                self.bom_id = bom.id
-                self.product_qty = self.bom_id.product_qty
-                self.product_uom_id = self.bom_id.product_uom_id.id
-            else:
-                self.bom_id = False
-                self.product_uom_id = self.product_id.uom_id.id
-            return {'domain': {'product_uom_id': [('category_id', '=', self.product_id.uom_id.category_id.id)]}}
-
-    @api.onchange('bom_id')
-    def _onchange_bom_id(self):
-        self.product_qty = self.bom_id.product_qty
-        self.product_uom_id = self.bom_id.product_uom_id.id
-        print("xxxxxxxxxxxxxxxx: ", self.move_raw_ids)
-        for move in self.move_raw_ids.filtered(lambda m: m.bom_line_id):
-            print(move, move.id)
-        self.move_raw_ids = [(2, move.id) for move in self.move_raw_ids.filtered(lambda m: m.bom_line_id)]
-        print("yyyyyyyyyyyyyyyyyyy: ", self.move_raw_ids)
-        self.picking_type_id = self.bom_id.picking_type_id or self.picking_type_id
+    # @api.onchange('product_id', 'picking_type_id', 'company_id')
+    # def onchange_product_id(self):
+    #     print("111111111111")
+    #     """ Finds UoM of changed product. """
+    #     if not self.product_id:
+    #         self.bom_id = False
+    #     else:
+    #         bom = self.env['mrp.bom']._bom_find(product=self.product_id, picking_type=self.picking_type_id,
+    #                                             company_id=self.company_id.id)
+    #         # , bom_type = 'normal'
+    #         print("111111111111", bom)
+    #         if bom:
+    #             self.bom_id = bom.id
+    #             self.product_qty = self.bom_id.product_qty
+    #             self.product_uom_id = self.bom_id.product_uom_id.id
+    #         else:
+    #             self.bom_id = False
+    #             self.product_uom_id = self.product_id.uom_id.id
+    #         return {'domain': {'product_uom_id': [('category_id', '=', self.product_id.uom_id.category_id.id)]}}
+    #
+    # @api.onchange('bom_id')
+    # def _onchange_bom_id(self):
+    #     self.product_qty = self.bom_id.product_qty
+    #     self.product_uom_id = self.bom_id.product_uom_id.id
+    #     print("xxxxxxxxxxxxxxxx: ", self.move_raw_ids)
+    #     for move in self.move_raw_ids.filtered(lambda m: m.bom_line_id):
+    #         print(move, move.id)
+    #     self.move_raw_ids = [(2, move.id) for move in self.move_raw_ids.filtered(lambda m: m.bom_line_id)]
+    #     print("yyyyyyyyyyyyyyyyyyy: ", self.move_raw_ids)
+    #     self.picking_type_id = self.bom_id.picking_type_id or self.picking_type_id

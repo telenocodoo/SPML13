@@ -1,0 +1,48 @@
+<odoo>
+    <data>
+
+        <record id="purchase_requisition_settings_form" model="ir.ui.view" >
+            <field name="name">res.config.settings</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('settings')]" position="inside">
+                    <div class="app_settings_block" data-string="Purchase Requisition" string="Purchase Requisition" data-key="purchase_requisition_updates">
+                        <div class="row mt16 o_settings_container" id="purchase_requisition_updates">
+                            <div class="col-lg-6 col-12 o_setting_box">
+                                <div class="o_setting_right_pane">
+                                    <span class="o_form_label">Purchase Requisition</span>
+                                    <div class="mt8" id="localization_text">
+                                        <group>
+                                            <field name="purchase_source_id" />
+                                            <field name="picking_type_id" />
+                                            <field name="debit_account_id" domain="[('internal_group','=','expense')]"/>
+                                            <field name="credit_account_id" domain="[('internal_group','=','asset')]"/>
+                                            <field name="purchase_journal_id" />
+                                            <field name="label" />
+                                        </group>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="purchase_requisition_configuration_action" model="ir.actions.act_window">
+            <field name="name">Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'purchase_requisition_updates'}</field>
+        </record>
+
+        <menuitem id="menu_purchase_requisition_settings"
+                  name="Settings"
+                  parent="material_purchase_requisitions.menu_purchase_requisition"
+                  sequence="99"
+                  action="purchase_requisition_configuration_action"/>
+    </data>
+</odoo>

@@ -1,0 +1,249 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* purchase_requisition_updates
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 13.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-06-21 11:37+0000\n"
+"PO-Revision-Date: 2020-06-21 11:37+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: purchase_requisition_updates
+#: model_terms:ir.ui.view,arch_db:purchase_requisition_updates.purchase_requisition_settings_form
+msgid "<span class=\"o_form_label\">Purchase Requisition</span>"
+msgstr "طلب الشراء"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields.selection,name:purchase_requisition_updates.selection__material_purchase_requisition__state__approve
+msgid "Approved"
+msgstr "الموافقه"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields.selection,name:purchase_requisition_updates.selection__material_purchase_requisition__state__cancel
+msgid "Cancelled"
+msgstr "الغاء"
+
+#. module: purchase_requisition_updates
+#: model:ir.model,name:purchase_requisition_updates.model_res_company
+msgid "Companies"
+msgstr "الشركات"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_res_config_settings__company_id
+msgid "Company"
+msgstr "الشركة"
+
+#. module: purchase_requisition_updates
+#: model:ir.model,name:purchase_requisition_updates.model_res_config_settings
+msgid "Config Settings"
+msgstr "ضبط الإعدادات"
+
+#. module: purchase_requisition_updates
+#: code:addons/purchase_requisition_updates/models/purchase_requisition.py:0
+#, python-format
+msgid ""
+"Could not reserve all requested products. Please use the 'Mark as Todo' "
+"button to handle the reservation manually."
+msgstr ""
+
+#. module: purchase_requisition_updates
+#: model_terms:ir.ui.view,arch_db:purchase_requisition_updates.material_purchase_requisition_form_inherit
+msgid "Create Request"
+msgstr "انشاء طلب"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_material_purchase_requisition__credit_account_id
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_res_company__credit_account_id
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_res_config_settings__credit_account_id
+msgid "Credit Account"
+msgstr "حساب الدائن"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_material_purchase_requisition__debit_account_id
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_res_company__debit_account_id
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_res_config_settings__debit_account_id
+msgid "Debit Account"
+msgstr "حساب المدين"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields.selection,name:purchase_requisition_updates.selection__material_purchase_requisition__type__finished_good
+msgid "Finished Good"
+msgstr ""
+
+#. module: purchase_requisition_updates
+#: code:addons/purchase_requisition_updates/models/purchase_requisition.py:0
+#: code:addons/purchase_requisition_updates/models/purchase_requisition.py:0
+#, python-format
+msgid "Immediate Transfer?"
+msgstr "نقل فوري؟"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields.selection,name:purchase_requisition_updates.selection__material_purchase_requisition_line__requisition_type__internal
+msgid "Internal Picking"
+msgstr "نقل داخلي"
+
+#. module: purchase_requisition_updates
+#: model:ir.model,name:purchase_requisition_updates.model_material_purchase_requisition_line
+msgid "Material Purchase Requisition Lines"
+msgstr "طلبات شراء المواد"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields.selection,name:purchase_requisition_updates.selection__material_purchase_requisition__state__draft
+msgid "New"
+msgstr "جديد"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_material_purchase_requisition__picking_number
+msgid "Picking Number"
+msgstr "رقم النقل"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_material_purchase_requisition__custom_picking_type_id
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_res_company__picking_type_id
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_res_config_settings__picking_type_id
+msgid "Picking Type"
+msgstr "نوع النقل"
+
+#. module: purchase_requisition_updates
+#: model_terms:ir.ui.view,arch_db:purchase_requisition_updates.material_purchase_requisition_form_inherit
+msgid "Picking order"
+msgstr "طلب النقل"
+
+#. module: purchase_requisition_updates
+#: code:addons/purchase_requisition_updates/models/purchase_requisition.py:0
+#, python-format
+msgid "Please add some items to move."
+msgstr "برجاء إضافة بعض العناصر لتحريكها."
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields.selection,name:purchase_requisition_updates.selection__material_purchase_requisition__state__prepare
+msgid "Preparing Transfer"
+msgstr "تجهيز الشحنه"
+
+#. module: purchase_requisition_updates
+#: model:ir.model,name:purchase_requisition_updates.model_product_category
+msgid "Product Category"
+msgstr "فئة المنتج"
+
+#. module: purchase_requisition_updates
+#: model:ir.model,name:purchase_requisition_updates.model_product_template
+msgid "Product Template"
+msgstr "قالب المنتج"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_material_purchase_requisition__purchase_number
+msgid "Purchase Number"
+msgstr "رقم الشراء"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields.selection,name:purchase_requisition_updates.selection__material_purchase_requisition_line__requisition_type__purchase
+msgid "Purchase Order"
+msgstr "طلب الشراء"
+
+#. module: purchase_requisition_updates
+#: model:ir.model,name:purchase_requisition_updates.model_material_purchase_requisition
+#: model_terms:ir.ui.view,arch_db:purchase_requisition_updates.purchase_requisition_settings_form
+msgid "Purchase Requisition"
+msgstr "طلب شراء"
+
+#. module: purchase_requisition_updates
+#: model_terms:ir.ui.view,arch_db:purchase_requisition_updates.material_purchase_requisition_form_inherit
+msgid "Purchases"
+msgstr "المشتريات"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_product_category__raw_material
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_product_product__raw_material
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_product_template__raw_material
+#: model:ir.model.fields.selection,name:purchase_requisition_updates.selection__material_purchase_requisition__type__raw_material
+msgid "Raw Material"
+msgstr "المواد الخام"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields.selection,name:purchase_requisition_updates.selection__material_purchase_requisition__state__receive
+msgid "Received"
+msgstr "استقبال"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields.selection,name:purchase_requisition_updates.selection__material_purchase_requisition__state__reject
+msgid "Rejected"
+msgstr "مرفوض"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields.selection,name:purchase_requisition_updates.selection__material_purchase_requisition__state__ir_approve
+msgid "Requested"
+msgstr "مطلوب"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_material_purchase_requisition_line__requisition_type
+msgid "Requisition Action"
+msgstr ""
+
+#. module: purchase_requisition_updates
+#: model:ir.actions.act_window,name:purchase_requisition_updates.purchase_requisition_configuration_action
+#: model:ir.ui.menu,name:purchase_requisition_updates.menu_purchase_requisition_settings
+msgid "Settings"
+msgstr "الاعدادات"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_material_purchase_requisition__location_id
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_res_company__source_location_id
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_res_config_settings__source_location_id
+msgid "Source Location"
+msgstr "المصدر الرئيسي"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_material_purchase_requisition__state
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_material_purchase_requisition_line__state
+msgid "State"
+msgstr "الحاله"
+
+#. module: purchase_requisition_updates
+#: code:addons/purchase_requisition_updates/models/purchase_requisition.py:0
+#, python-format
+msgid ""
+"This picking %s State Isn't Ready The State Of Picking Order Must Be Ready "
+"To Be Validated"
+msgstr ""
+
+#. module: purchase_requisition_updates
+#: model:ir.model,name:purchase_requisition_updates.model_stock_picking
+msgid "Transfer"
+msgstr "الشحنة"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields.selection,name:purchase_requisition_updates.selection__material_purchase_requisition__state__stock
+msgid "Transfer Ready"
+msgstr "تهيئه الشحنه"
+
+#. module: purchase_requisition_updates
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_material_purchase_requisition__type
+#: model:ir.model.fields,field_description:purchase_requisition_updates.field_material_purchase_requisition_line__type
+msgid "Type"
+msgstr "النوع"
+
+#. module: purchase_requisition_updates
+#: code:addons/purchase_requisition_updates/models/purchase_requisition.py:0
+#, python-format
+msgid ""
+"You cannot validate a transfer if no quantites are reserved nor done. To "
+"force the transfer, switch in edit more and encode the done quantities."
+msgstr ""
+
+#. module: purchase_requisition_updates
+#: code:addons/purchase_requisition_updates/models/purchase_requisition.py:0
+#, python-format
+msgid "You need to supply a Lot/Serial number for product %s."
+msgstr "يجب أن توفر رقم لوط/رقم مسلسل للمنتج %s."
+
+#. module: purchase_requisition_updates
+#: model_terms:ir.ui.view,arch_db:purchase_requisition_updates.material_purchase_requisition_form_inherit
+msgid "confirm"
+msgstr "موافق"

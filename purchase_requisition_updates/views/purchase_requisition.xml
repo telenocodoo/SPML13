@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="product_category_form_view_inherit" model="ir.ui.view" >
+        <field name="name">product.category</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_form_view"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='parent_id']" position="after">
+                    <field name="raw_material"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="product_template_only_form_view_inherit" model="ir.ui.view" >
+        <field name="name">product.template</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//notebook" position="before">
+                <div>
+                    <field name="raw_material"/>
+                    <label for="raw_material"/>
+                </div>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="product_normal_form_view_inherit" model="ir.ui.view" >
+        <field name="name">product.template</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//notebook" position="before">
+                <div>
+                    <field name="raw_material"/>
+                    <label for="raw_material"/>
+                </div>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="material_purchase_requisition_form_inherit" model="ir.ui.view" >
+        <field name="name">material.purchase.requisition</field>
+        <field name="model">material.purchase.requisition</field>
+        <field name="inherit_id" ref="material_purchase_requisitions.material_purchase_requisition_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='requisition_confirm']" position="replace" />
+
+            <xpath expr="//button[@name='show_picking']" position="replace">
+                <button class="oe_stat_button" type="object" icon="fa-truck"
+                                name="show_picking" string="Picking order" groups="base.group_user">
+                    <field name="picking_number" />
+                </button>
+            </xpath>
+            <xpath expr="//button[@name='action_show_po']" position="replace">
+                <button class="oe_stat_button" type="object" icon="fa-book"
+                                name="action_show_po" string="Purchases">
+                    <field name="purchase_number" />
+                </button>
+            </xpath>
+<!--            <xpath expr="//button[@name='action_show_po']" position="inside">-->
+<!--                <field name="picking_number" />-->
+<!--            </xpath>-->
+            <xpath expr="//button[@name='manager_approve']" position="replace">
+                <button name="manager_approve" type="object" string="Create Request"
+                        states="draft,cancel" class="btn-primary"
+                        groups="material_purchase_requisitions.group_purchase_requisition_department"/>
+            </xpath>
+
+            <xpath expr="//field[@name='location_id']/../.." position="inside">
+                <group>
+                    <field name="debit_account_id" domain="[('internal_group','=','expense')]"/>
+                    <field name="purchase_journal_id" domain="[('internal_group','=','asset')]"/>
+                </group>
+                <group>
+                    <field name="credit_account_id" />
+                    <field name="label" />
+                </group>
+            </xpath>
+
+            <xpath expr="//field[@name='state']" position="replace">
+                <field name="state" widget="statusbar" string="confirm"
+                       statusbar_visible="draft,ir_approve,approve,prepare,stock,receive"/>
+            </xpath>
+
+            <xpath expr="//field[@name='employee_id']" position="before">
+                <field name="type" />
+            </xpath>
+
+<!--            <xpath expr="//field[@name='requisition_line_ids']" position="attributes">-->
+<!--                <sttribute name="context">{'default_type': type}"</sttribute>-->
+<!--            </xpath>-->
+            <xpath expr="//field[@name='requisition_line_ids']//tree//field[@name='requisition_type']" position="after">
+                <field name="state" invisible="1"/>
+                <field name="type" />
+            </xpath>
+            <xpath expr="//field[@name='confirm_date']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='employee_confirm_id']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='requisition_line_ids']//tree//field[@name='requisition_type']" position="attributes">
+                <attribute name="attrs">{'readonly':[('state','=','draft')]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+
+</odoo>
