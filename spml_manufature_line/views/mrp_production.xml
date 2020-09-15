@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_stock_move_raw_tree_inherit" model="ir.ui.view">
+        <field name="name">mrp.move.tree.view</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="mrp.view_stock_move_raw_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='needs_lots']" position="after">
+                <field name="line_number" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_stock_move_lots_inherit" model="ir.ui.view">
+        <field name="name">mrp.move.tree.view</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="mrp.view_stock_move_lots"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="line_number" />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
